@@ -1,0 +1,205 @@
+{
+ "v": 1,
+ "linea": "Genova–Ventimiglia · tratta Finale Ligure – Albenga",
+ "nota": "Un solo file dati per il sito e per la funzione edge. I km sono le progressive RFI da Savona; per i passaggi, km della stazione di riferimento + scostamento lungo linea misurato sulla geometria OpenStreetMap (validato sui sette di Loano: scarto 8-12 m).",
+ "stazioni": [
+  {
+   "id": "S04801",
+   "nome": "Savona",
+   "vt": "SAVONA",
+   "km": 0.0
+  },
+  {
+   "id": "S04526",
+   "nome": "Spotorno Noli",
+   "vt": "SPOTORNO NOLI",
+   "km": 10.11
+  },
+  {
+   "id": "S04522",
+   "nome": "Finale Ligure Marina",
+   "vt": "FINALE LIGURE MARINA",
+   "km": 18.62
+  },
+  {
+   "id": "S04521",
+   "nome": "Borgio Verezzi",
+   "vt": "BORGIO VEREZZI",
+   "km": 21.45
+  },
+  {
+   "id": "S04520",
+   "nome": "Pietra Ligure",
+   "vt": "PIETRA LIGURE",
+   "km": 24.29
+  },
+  {
+   "id": "S04519",
+   "nome": "Loano",
+   "vt": "LOANO",
+   "km": 27.43
+  },
+  {
+   "id": "S04518",
+   "nome": "Borghetto S.Spirito",
+   "vt": "BORGHETTO S.SPIRITO",
+   "km": 29.21
+  },
+  {
+   "id": "S04517",
+   "nome": "Ceriale",
+   "vt": "CERIALE",
+   "km": 30.5
+  },
+  {
+   "id": "S04516",
+   "nome": "Albenga",
+   "vt": "ALBENGA",
+   "km": 36.34
+  },
+  {
+   "id": "S04515",
+   "nome": "Alassio",
+   "vt": "ALASSIO",
+   "km": 42.29
+  },
+  {
+   "id": "S04524",
+   "nome": "Diano",
+   "vt": "DIANO",
+   "km": 54.89
+  },
+  {
+   "id": "S04523",
+   "nome": "Imperia",
+   "vt": "IMPERIA",
+   "km": 61.08
+  }
+ ],
+ "sorvegliate": [
+  "S04522",
+  "S04521",
+  "S04520",
+  "S04519",
+  "S04518",
+  "S04517",
+  "S04516",
+  "S04801",
+  "S04515"
+ ],
+ "tempiPrudenti": {
+  "pre": 5,
+  "prePassa": 4.5,
+  "post": 1,
+  "nota": "Usati dove nessuno ha ancora cronometrato la sbarra. Larghi apposta."
+ },
+ "comuni": [
+  {
+   "id": "loano",
+   "nome": "Loano",
+   "stazione": "S04519",
+   "lat": 44.1256,
+   "lon": 8.2568,
+   "tabella": "percorsi-loano.json",
+   "tempi": {
+    "pre": 3.75,
+    "prePassa": 3.25,
+    "post": 0.5,
+    "fonte": "Cronometro a Via Ambrogio Ramella, 28 agosto 2026: treni che fermano 3:14, 3:15, 3:27; treno che passa dritto 2:33; risalita 12-25 s."
+   },
+   "passaggi": [
+    {
+     "id": "ramella",
+     "nome": "Via Ambrogio Ramella",
+     "lat": 44.12395,
+     "lon": 8.25527,
+     "km": 27.251,
+     "misurato": true
+    },
+    {
+     "id": "cesarea",
+     "nome": "Via Giuseppe Cesarea",
+     "lat": 44.12579,
+     "lon": 8.25624,
+     "km": 27.032,
+     "misurato": false
+    },
+    {
+     "id": "stella",
+     "nome": "Via Simone Stella",
+     "lat": 44.12819,
+     "lon": 8.25802,
+     "km": 26.731,
+     "misurato": false
+    },
+    {
+     "id": "isnardi",
+     "nome": "Via Felice Isnardi",
+     "lat": 44.129,
+     "lon": 8.25872,
+     "km": 26.626,
+     "misurato": false
+    },
+    {
+     "id": "martiri",
+     "nome": "Via Martiri della Libertà",
+     "lat": 44.13055,
+     "lon": 8.26019,
+     "km": 26.42,
+     "misurato": false
+    },
+    {
+     "id": "loreto",
+     "nome": "Lungomare Madonna del Loreto",
+     "lat": 44.13701,
+     "lon": 8.26659,
+     "km": 25.545,
+     "misurato": false
+    },
+    {
+     "id": "marconi",
+     "nome": "Lungomare Marconi",
+     "lat": 44.11668,
+     "lon": 8.2486,
+     "km": 28.225,
+     "misurato": false
+    }
+   ]
+  },
+  {
+   "id": "pietra",
+   "nome": "Pietra Ligure",
+   "stazione": "S04520",
+   "lat": 44.1472,
+   "lon": 8.284,
+   "tabella": "percorsi-pietra.json",
+   "tempi": null,
+   "passaggi": [
+    {
+     "id": "rossello",
+     "nome": "Via Suor Maria Giuseppa Rossello",
+     "lat": 44.1477,
+     "lon": 8.28013,
+     "km": 23.935,
+     "misurato": false
+    },
+    {
+     "id": "boccone",
+     "nome": "Via Casello dei Boccone",
+     "lat": 44.15411,
+     "lon": 8.29535,
+     "km": 22.496,
+     "misurato": false
+    },
+    {
+     "id": "matteotti",
+     "nome": "Via Matteotti / Via XXV Aprile",
+     "lat": 44.15825,
+     "lon": 8.31145,
+     "km": 21.13,
+     "misurato": false
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,598 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Sbarra Su — Loano e Pietra Ligure</title>
+<meta name="description" content="Dice se fai in tempo ad attraversare il passaggio a livello prima che si chiuda. Loano e Pietra Ligure.">
+<meta name="theme-color" content="#0b1220">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<style>
+  :root{
+    --bg:#0b1220; --card:#151d2e; --line:#243149; --txt:#e8eefc; --dim:#93a1bd; --acc:#4c8dff;
+    --btn:#1e2a42; --field:#0f1728; --selbg:#1e3a63; --panel-txt:#dbe5fa;
+    --ok-a:#0f3d24; --ok-b:#123a22; --ok-br:#1f6b3d;
+    --ko-a:#4a1518; --ko-b:#3d1215; --ko-br:#7d2a2e;
+    --wa-a:#4a3410; --wa-b:#3d2b0d; --wa-br:#7d5e1f;
+    --veil:rgba(255,255,255,.12);
+    --warn-bg:#3a2a10; --warn-br:#7d5e1f; --warn-tx:#ffe2ad;
+    --tag-reg:#1d3a52; --tag-reg-t:#b8ddff; --tag-ic:#3a2a5e; --tag-ic-t:#d3c4ff;
+    --g-ok:#3ddc84; --g-ko:#ff7b7e; --g-wa:#ffc24d; --lab:#cfd9ef;
+  }
+  :root[data-tema="chiaro"]{
+    --bg:#eef2f9; --card:#fff; --line:#dbe3f0; --txt:#101a2c; --dim:#5d6b85; --acc:#1f6bff;
+    --btn:#eaeffa; --field:#f7f9fd; --selbg:#dbe8ff; --panel-txt:#10202c;
+    --ok-a:#c9f0d8; --ok-b:#b9ecce; --ok-br:#5fb883;
+    --ko-a:#fcd8d9; --ko-b:#f9c9cb; --ko-br:#e28e90;
+    --wa-a:#fdeac4; --wa-b:#fbe0b0; --wa-br:#d9ab54;
+    --veil:rgba(0,0,0,.10);
+    --warn-bg:#fff4dc; --warn-br:#d9ab54; --warn-tx:#6b4a10;
+    --tag-reg:#dceaf9; --tag-reg-t:#18496f; --tag-ic:#e6ddfa; --tag-ic-t:#432a72;
+    --g-ok:#12854a; --g-ko:#c0272d; --g-wa:#8f6206; --lab:#22314c;
+  }
+  *{box-sizing:border-box}
+  /* [hidden] arriva dal browser e perde contro qualsiasi display nostro: questa
+     riga chiude la questione per ogni elemento presente e futuro. */
+  [hidden]{display:none !important}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--txt);
+    font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  .wrap{max-width:560px;margin:0 auto;padding:16px 16px 48px}
+  header{display:flex;flex-direction:column;align-items:center;gap:7px;margin-bottom:14px}
+  .logo{display:block;height:34px;width:auto}
+  :root[data-tema="chiaro"] .logo{filter:invert(1)}
+  .sottotitolo{font-size:10.5px;letter-spacing:.14em;color:var(--dim);opacity:.75;font-weight:600;margin:0;text-align:center}
+  .hr{display:flex;align-items:center;gap:10px;margin-top:2px}
+  #clock{font-variant-numeric:tabular-nums;font-size:15px;color:var(--dim)}
+  .langsw{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+  .langsw button{background:none;border:none;color:var(--dim);font-size:11px;font-weight:800;padding:4px 7px;cursor:pointer;letter-spacing:.04em}
+  .langsw button.on{background:var(--acc);color:#fff}
+  .temaBtn{background:none;border:1px solid var(--line);border-radius:8px;color:var(--dim);font-size:14px;padding:2px 8px;cursor:pointer}
+
+  .light{border-radius:20px;padding:26px 20px;text-align:center;border:1px solid var(--line);background:var(--card);transition:background .3s;color:var(--panel-txt)}
+  .light.ok{background:linear-gradient(160deg,var(--ok-a),var(--ok-b));border-color:var(--ok-br)}
+  .light.ko{background:linear-gradient(160deg,var(--ko-a),var(--ko-b));border-color:var(--ko-br)}
+  .light.warn{background:linear-gradient(160deg,var(--wa-a),var(--wa-b));border-color:var(--wa-br)}
+  .badge{width:46px;height:46px;line-height:46px;border-radius:50%;margin:0 auto 10px;font-size:26px;font-weight:800;background:var(--veil)}
+  .light.ok .badge{background:rgba(29,185,84,.22);color:#1a7f45}
+  .light.ko .badge{background:rgba(229,72,77,.22);color:#a3242a}
+  .light.warn .badge{background:rgba(245,165,36,.22);color:#8a5c07}
+  .verdict{font-size:32px;font-weight:800;letter-spacing:-.02em;margin:0 0 2px}
+  .big{font-size:76px;font-weight:800;line-height:1;margin:8px 0 0;font-variant-numeric:tabular-nums}
+  .big small{font-size:22px;font-weight:700;margin-left:4px}
+  .lbl{font-size:12px;letter-spacing:.12em;text-transform:uppercase;opacity:.75;margin-top:4px}
+  .sub{font-size:15px;opacity:.9;margin:12px 0 0}
+  .whereto{font-size:12px;opacity:.6;margin:10px 0 0}
+  .bar{height:6px;border-radius:3px;background:var(--veil);margin:14px 0 0;overflow:hidden}
+  .bar i{display:block;height:100%;border-radius:3px;background:currentColor;opacity:.7}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-top:14px}
+  .card h2{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin:0 0 10px;font-weight:700}
+  .row{display:flex;align-items:center;gap:10px;margin:10px 0}
+  .row label{flex:1;color:var(--lab);font-size:14px}
+  .row .v{min-width:56px;text-align:right;color:var(--dim);font-variant-numeric:tabular-nums}
+  input[type=range]{flex:2;accent-color:var(--acc)}
+  select,button.b,input[type=text]{background:var(--btn);color:var(--txt);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:15px}
+  select{width:100%}
+  button.b{cursor:pointer;font-weight:600}
+  button.b.acc{background:var(--acc);border-color:var(--acc);color:#fff}
+  .link{background:none;border:none;color:var(--acc);font-size:15px;padding:0;cursor:pointer;font-weight:600}
+  .seg{display:flex;border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:12px 0 6px}
+  .seg button{flex:1;background:var(--btn);border:none;color:var(--txt);padding:12px;font-size:15px;font-weight:600;cursor:pointer}
+  .seg button.on{background:var(--acc);color:#fff}
+  .note{font-size:13.5px;color:var(--dim);margin:4px 0 0;line-height:1.5}
+  .status{font-size:15px;line-height:1.5;margin:0 0 8px}
+  .status b{color:var(--txt)}
+  details{margin-top:10px}
+  summary{cursor:pointer;color:var(--dim);font-weight:700;font-size:12px;letter-spacing:.12em;text-transform:uppercase;list-style:none}
+  summary::before{content:"▸ ";}
+  details[open] summary::before{content:"▾ ";}
+  .grp{font-size:13px;color:var(--dim);margin:12px 0 2px;font-weight:600}
+
+  .fiducia{border-radius:12px;padding:10px 12px;font-size:13.5px;line-height:1.5;margin:10px 0 0;border:1px solid}
+  .fiducia.misurato{background:rgba(29,185,84,.10);border-color:var(--ok-br)}
+  .fiducia.assunto{background:rgba(76,141,255,.10);border-color:var(--line)}
+  .fiducia.stimato{background:var(--warn-bg);border-color:var(--warn-br);color:var(--warn-tx)}
+
+  table{width:100%;border-collapse:collapse}
+  td{padding:10px 0;border-bottom:1px solid var(--line);vertical-align:top;font-size:15px}
+  tr:last-child td{border-bottom:none}
+  td.t{width:58px;font-weight:700;font-variant-numeric:tabular-nums}
+  td.r{text-align:right;color:var(--dim);white-space:nowrap;font-variant-numeric:tabular-nums}
+  .tag{display:inline-block;font-size:11px;font-weight:800;padding:2px 7px;border-radius:6px;margin-right:6px;letter-spacing:.04em}
+  .tag.reg{background:var(--tag-reg);color:var(--tag-reg-t)} .tag.ic{background:var(--tag-ic);color:var(--tag-ic-t)}
+  .pm{display:inline-block;font-size:11px;color:var(--dim);border:1px solid var(--line);border-radius:6px;padding:1px 6px;margin-left:6px}
+  .late{color:var(--g-wa);font-weight:700}
+  .dest{color:var(--dim);font-size:13.5px}
+
+  .warnbox{background:var(--warn-bg);border:1px solid var(--warn-br);color:var(--warn-tx);border-radius:12px;padding:12px 14px;font-size:13.5px;line-height:1.5;margin-top:14px}
+  footer{margin-top:18px;color:var(--dim);font-size:13.5px;line-height:1.55}
+  footer p{margin:6px 0}
+  .sheet{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:flex-end;z-index:20}
+  .sheet .in{background:var(--card);border-radius:18px 18px 0 0;max-height:88vh;overflow:auto;padding:18px 18px 30px;width:100%;max-width:640px;margin:0 auto;font-size:14.5px;line-height:1.55}
+  .sheet h3{font-size:15px;margin:16px 0 6px}
+  .sheet .x{position:sticky;top:0;float:right;background:var(--btn);border:1px solid var(--line);color:var(--txt);border-radius:50%;width:34px;height:34px;font-size:18px;cursor:pointer}
+  .micro{background:var(--field);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:14px;line-height:1.55;margin:10px 0}
+  .micro h4{margin:0 0 6px;font-size:14px}
+  .micro p{margin:6px 0}
+  .install{display:flex;gap:10px;align-items:center;justify-content:space-between;margin-top:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <img class="logo" src="logo.png" srcset="logo.png 1x, logo@2x.png 2x" alt="SBARRA SÙ">
+    <p class="sottotitolo" id="sottotitolo">PASSAGGIO A LIVELLO · LOANO</p>
+    <div class="hr">
+      <button class="temaBtn" id="tema" title="Tema">☀</button>
+      <div class="langsw"><button id="l-it" class="on">IT</button><button id="l-en">EN</button></div>
+      <span id="clock">--:--</span>
+    </div>
+  </header>
+
+  <section class="light" id="light">
+    <div class="badge" id="badge">…</div>
+    <p class="verdict" id="verdict" data-i18n="loading">Carico…</p>
+    <p class="big" id="big" hidden></p>
+    <p class="lbl" id="lbl" hidden></p>
+    <div class="bar" id="bar" hidden><i id="barIn"></i></div>
+    <p class="sub" id="sub"></p>
+    <p class="whereto" id="whereto"></p>
+  </section>
+
+  <section class="card">
+    <h2 data-i18n="hFrom">Da dove parti</h2>
+    <p class="status" id="posStatus"></p>
+    <div class="row" id="rowGps"><button class="b acc" id="gps" data-i18n="btnGps">Usa la mia posizione</button>
+      <button class="b" id="btnAddr" data-i18n="btnAddr">Scrivi un indirizzo</button></div>
+    <div class="row" id="rowAddr" hidden><input type="text" id="addr" placeholder="Via, numero" style="flex:1"><button class="b" id="find" data-i18n="btnFind">Cerca</button></div>
+    <div id="micro" class="micro" hidden>
+      <h4 id="microTit"></h4><p id="micro1"></p><p id="micro2"></p><p id="micro3"></p><p id="micro4"></p>
+      <div class="row"><button class="b acc" id="microOk" data-i18n="microOk">Ho capito, continua</button><button class="b" id="microNo" data-i18n="microNo">Non ora</button></div>
+    </div>
+    <p class="row" id="rowStop" hidden><button class="link" id="stopPos" data-i18n="stopPos">Smetti di usare la posizione</button></p>
+
+    <div class="seg"><button id="mDevo" class="on" data-i18n="mDevo">Devo ancora uscire</button><button id="mStrada" data-i18n="mStrada">Sono già in strada</button></div>
+    <p class="note" id="modeNote"></p>
+    <div class="row"><label id="lblWalk" data-i18n="lblWalk">Minuti a piedi</label><input type="range" id="walk" min="1" max="30" step="1"><span class="v" id="walkV"></span></div>
+    <div class="row" id="rowExit"><label data-i18n="lblExit">Tempo per incamminarti</label><input type="range" id="exit" min="0" max="15" step="1"><span class="v" id="exitV"></span></div>
+    <div class="row" id="rowBuf"><label data-i18n="lblBuf">Margine</label><input type="range" id="buf" min="0" max="5" step="1"><span class="v" id="bufV"></span></div>
+
+    <div class="grp" data-i18n="grpPL">Comune e passaggio a livello</div>
+    <div class="row"><select id="comune"></select></div>
+    <div class="row"><select id="pl"></select></div>
+    <p class="note" id="plNote"></p>
+    <p class="note" id="plVicino" hidden><button class="link" id="plVicinoBtn"></button></p>
+    <div class="fiducia" id="fiducia"></div>
+
+    <details id="adv"><summary data-i18n="adv">Avanzate</summary>
+      <p class="note" data-i18n="advNote">Quanto prima del treno scende la sbarra e quanto dopo risale. I valori di partenza sono quelli misurati col cronometro dove ci sono, prudenti dove non ci sono ancora.</p>
+      <div class="grp" data-i18n="advFermano">Treni che fermano in stazione (regionali)</div>
+      <div class="row"><label data-i18n="lblPre">Sbarra giù</label><input type="range" id="pre" min="1" max="8" step="0.25"><span class="v" id="preV"></span></div>
+      <div class="grp" data-i18n="advNonFermano">Treni che non fermano in stazione (Intercity)</div>
+      <div class="row"><label data-i18n="lblPre">Sbarra giù</label><input type="range" id="prePassa" min="1" max="8" step="0.25"><span class="v" id="prePassaV"></span></div>
+      <div class="grp" data-i18n="advDopo">Dopo il passaggio del treno</div>
+      <div class="row"><label data-i18n="lblPost">Sbarra su</label><input type="range" id="post" min="0" max="3" step="0.25"><span class="v" id="postV"></span></div>
+      <p class="row"><button class="link" id="reset" data-i18n="reset">Torna ai valori di partenza</button></p>
+    </details>
+  </section>
+
+  <section class="card">
+    <h2 data-i18n="hNext">Prossimi passaggi</h2>
+    <table id="list"><tbody></tbody></table>
+    <p class="row" id="rowMore" hidden><button class="link" id="more"></button></p>
+    <div class="row" style="margin-top:12px"><button class="b" id="refresh" data-i18n="refresh">Aggiorna adesso</button><span class="v" id="dataOf" style="flex:1"></span></div>
+  </section>
+
+  <footer>
+    <details><summary data-i18n="howTit">Come funziona / limiti</summary>
+      <p id="how1"></p><p id="how2"></p><p id="how3"></p>
+      <p id="how4" data-i18n="how4">Il calcolo delle finestre della sbarra avviene una volta per tutti su un server e il telefono riceve solo il risultato: il carico verso RFI non cresce con il numero di visitatori.</p>
+    </details>
+    <div class="warnbox" id="warnbox"></div>
+    <p style="margin-top:14px"><button class="link" id="legalOpen"></button> · <span id="contatto"></span></p>
+    <div class="install" id="install" hidden><span data-i18n="installTxt">Puoi aggiungere Sbarra Su alla schermata iniziale.</span><button class="b" id="installBtn"></button></div>
+  </footer>
+</div>
+
+<div class="sheet" id="legal" hidden><div class="in">
+  <button class="x" id="legalClose" aria-label="Chiudi">×</button>
+  <h2 id="legalTitle" style="margin-top:4px"></h2>
+  <p class="note" id="legalUpdated"></p>
+  <div id="legalBody"></div>
+</div></div>
+
+<script type="module">
+import { finestreDa, valuta } from "/motore.js";
+
+// ---- testi -------------------------------------------------------------------------
+const DICT = {
+  it: {
+    loading:"Carico…", hFrom:"Da dove parti", btnGps:"Usa la mia posizione", btnAddr:"Scrivi un indirizzo", btnFind:"Cerca",
+    microOk:"Ho capito, continua", microNo:"Non ora", stopPos:"Smetti di usare la posizione",
+    mDevo:"Devo ancora uscire", mStrada:"Sono già in strada",
+    modeDevo:"Conto il tempo per prepararti e incamminarti, più un margine.",
+    modeStrada:"Stai già camminando: tempo per incamminarti e margine azzerati.",
+    lblWalk:"Minuti a piedi", lblWalkAuto:"Minuti a piedi (calcolati)", lblExit:"Tempo per incamminarti", lblBuf:"Margine",
+    grpPL:"Comune e passaggio a livello", adv:"Avanzate",
+    advNote:"Quanto prima del treno scende la sbarra e quanto dopo risale. I valori di partenza sono quelli misurati col cronometro dove ci sono, prudenti dove non ci sono ancora.",
+    advFermano:"Treni che fermano in stazione (regionali)", advNonFermano:"Treni che non fermano in stazione (Intercity)", advDopo:"Dopo il passaggio del treno",
+    lblPre:"Sbarra giù", lblPost:"Sbarra su", reset:"Torna ai valori di partenza",
+    hNext:"Prossimi passaggi", refresh:"Aggiorna adesso", howTit:"Come funziona / limiti",
+    how4:"Il calcolo delle finestre della sbarra avviene una volta per tutti su un server e il telefono riceve solo il risultato: il carico verso RFI non cresce con il numero di visitatori.",
+    installTxt:"Puoi aggiungere Sbarra Su alla schermata iniziale.",
+    unitMin:"min", nord:"a nord della stazione", sud:"a sud della stazione", di:"di",
+    go:"VAI", goNow:"VAI SUBITO", wait:"ASPETTA", vantaggio:"DI VANTAGGIO", primaDi:"PRIMA DI USCIRE", primaDiRip:"PRIMA DI RIPARTIRE",
+    noTrains:"Nessun treno nella prossima ora e mezza.", nessunDato:"Dati non disponibili in questo momento: non posso dirti niente di affidabile.",
+    subGo:(h)=>"Se parti entro le "+h+" trovi la sbarra su.", subGoNow:(h)=>"Non rallentare: se parti dopo le "+h+" la trovi giù.",
+    subWait:(t,h,n,r)=>"Trovi la sbarra giù per "+t+", passa alle "+h+(n>1?", poi altri "+(n-1)+" treni":"")+" · "+(r?"riparti":"esci")+" alle ",
+    subGoLong:"Nessun treno in arrivo per ora.",
+    arrive:(pl,m)=>pl+" · "+m+" min per arrivarci",
+    stFromTo:(da,a,m,min,exit)=>"Da <b>"+da+"</b> a <b>"+a+"</b>"+(m!=null?": "+m+" m, "+min+" min a piedi":"")+(exit?", più "+exit+" min per incamminarti.":"."),
+    stNoPos:"Scegli il passaggio a livello e imposta i minuti a piedi, oppure usa la posizione.",
+    stLocating:"Cerco la posizione…", stAffina:(m)=>"Cerco la posizione… (per ora precisa a ±"+m+" m)",
+    stImprecisa:(m)=>"Il segnale è troppo debole: la posizione è incerta di ±"+m+" m, troppo per calcolare i minuti. Riprova fra qualche secondo all'aperto, oppure scrivi un indirizzo.",
+    stAcc:(m)=>" Posizione precisa a ±"+m+" m.", stVecchia:(m)=>" Attenzione: è la posizione di "+m+" min fa, potresti esserti spostato.",
+    stDenied:"Permesso negato. Puoi scrivere un indirizzo, oppure impostare i minuti a mano.", stUnavailable:"Posizione non disponibile. Puoi scrivere un indirizzo, oppure impostare i minuti a mano.",
+    stNoGeo:"Questo browser non ha la geolocalizzazione.", stFuori:"Sei fuori dalle zone coperte: i minuti a piedi vanno impostati a mano.",
+    stSearching:"Cerco l'indirizzo…", stNotFound:"Indirizzo non trovato.", posLabel:"posizione attuale",
+    plCloser:(n)=>"Sei più vicino a "+n+" — passa a quello",
+    fidMisurato:(f)=>"<b>Tempi misurati qui.</b> "+f, fidAssunto:(dove,f)=>"<b>Tempi misurati a "+dove+"</b> e assunti uguali per questo passaggio. "+f,
+    fidStimato:"<b>Qui nessuno ha ancora cronometrato la sbarra.</b> I tempi sono prudenti apposta: la sbarra risulta giù più a lungo di quanto probabilmente sia. Se la cronometri, scrivici.",
+    more:(n)=>"Mostra tutti ("+n+")", less:"Mostra solo i prossimi 3", ora:"ora", tra:(m)=>"tra "+m+"′", passato:"passato", dataOf:(h)=>"dati di "+h,
+    legalLink:"Avvertenze e privacy", legalTitle:"Avvertenze e privacy", legalUpdated:"Ultimo aggiornamento: 9 agosto 2026", legalBody:"<h3>Avvertenze</h3><p>Sbarra Su è un progetto personale, gratuito e non ufficiale. Non ha alcun rapporto con RFI, Trenitalia o i Comuni di Loano e Pietra Ligure.</p><ul><li><b>Non è un sistema di sicurezza.</b> È una stima costruita su orari pubblici, e come tutte le stime può sbagliare.</li><li><b>I treni merci non sono visibili.</b> I dati generali di circolazione sono riservati, quindi lo strumento non può tenerne conto.</li><li>Manovre, treni straordinari, guasti e chiusure prolungate della sbarra non sono prevedibili.</li><li>Gli orari dei treni sono desunti da dati pubblici e possono verificarsi anomalie o incongruenze temporali.</li><li>L'orario dei treni che <b>non fermano nella stazione vicina al passaggio</b> è ricostruito dal percorso e porta un margine di incertezza, indicato con ±N′. Riguarda soprattutto gli Intercity, ma vale per qualunque treno che non si fermi in stazione.</li></ul><p>Sbarra Su è offerto gratuitamente e fa del suo meglio con i dati pubblici disponibili. Il Titolare non risponde di eventuali danni derivanti dall'uso del sito.</p><h3>Informativa sul trattamento dei dati personali</h3><p class='upd'>ai sensi degli artt. 13 e 14 del Regolamento UE 2016/679 (GDPR)</p><p>Non c'è registrazione, non c'è un database e non viene conservato alcun dato riferito agli utenti. Non esiste alcun archivio da cui tali dati possano essere sottratti. Quanto segue descrive integralmente i pochi trattamenti che restano.</p><h3>Titolare del trattamento e contatti</h3><p>Il Titolare del trattamento è <b>Matteo Brock</b>, contattabile all'indirizzo di posta elettronica <b>info@sbarrasu.it</b>.</p><h3>Finalità del trattamento e base giuridica</h3><p><b>Funzionamento, manutenzione e sicurezza del sito.</b> Il fornitore di hosting registra i dati tecnici di connessione necessari alla consegna delle pagine e alla protezione del servizio da usi abusivi. <i>Base giuridica:</i> il legittimo interesse del Titolare all'erogazione e alla tutela del servizio (art. 6(1) lett. f).</p><p>Su iniziativa dell'interessato, e soltanto previo suo consenso, il sito effettua un secondo trattamento relativo ai dati di ubicazione, descritto nella sezione seguente.</p><h3>Dati relativi all'ubicazione</h3><p>L'interessato può attivare, di propria iniziativa, la funzione di localizzazione, oppure digitare un indirizzo. In tal caso il browser comunica alla pagina le coordinate geografiche approssimative del dispositivo.</p><p><b>Origine del dato.</b> La posizione è determinata dal dispositivo dell'interessato tramite la funzione di geolocalizzazione del browser. Le modalità di rilevazione — satelliti GPS, reti Wi-Fi, celle telefoniche — dipendono dal dispositivo e dal suo sistema operativo e sono regolate dalle impostazioni e dall'informativa del relativo produttore. Il Titolare non interviene in tale rilevazione.</p><p><b>Finalità.</b> Calcolare il percorso pedonale e il tempo di percorrenza fra la posizione dell'interessato e il passaggio a livello selezionato.</p><p><b>Base giuridica.</b> Il consenso dell'interessato (art. 6, par. 1, lett. a, del Regolamento UE 2016/679; artt. 122 e 126 del D.lgs. 196/2003), prestato mediante l'autorizzazione richiesta dal browser dopo la lettura della presente informativa. Il consenso è revocabile in qualsiasi momento.</p><p><b>Destinatari.</b> <b>Di norma nessuno.</b> Il calcolo avviene interamente nel browser dell'interessato, su una tabella di distanze pedonali precalcolate inclusa nel sito: le coordinate non vengono trasmesse ad alcun soggetto. La trasmissione avviene solo in due casi residuali — se l'interessato si trova fuori dall'area coperta dalla tabella, oppure se digita un indirizzo anziché usare la posizione del dispositivo. In tali casi le coordinate sono inviate a <b>FOSSGIS e.V.</b>, associazione di diritto tedesco con sede in Germania (calcolo del percorso), e alla <b>OpenStreetMap Foundation</b>, ente di diritto inglese (geocodifica dell'indirizzo). Tali soggetti operano quali titolari autonomi del trattamento e registrano le richieste ricevute nei file di registro dei propri server.</p><p><b>Dati trasmessi.</b> Le sole coordinate di partenza e di destinazione, prive di qualunque identificativo dell'interessato.</p><p><b>Conservazione presso il Titolare.</b> Nessuna. Le coordinate non sono ricevute né registrate dal Titolare. Il risultato del calcolo, espresso in metri e minuti, resta nella memoria locale del dispositivo dell'interessato.</p><p><b>Revoca e interruzione.</b> L'interessato può interrompere in qualsiasi momento l'utilizzo della posizione mediante l'apposito comando «Smetti di usare la posizione» presente nella pagina, e revocare il permesso dalle impostazioni del browser o del sistema operativo. Il rifiuto e la revoca non limitano l'utilizzo del sito: il tempo di percorrenza può essere inserito manualmente.</p><h3>Categorie di dati trattati e destinatari</h3><ul><li><b>Dati di navigazione</b> — indirizzo IP e dati tecnici di connessione. Destinatario: <b>Netlify, Inc.</b>, fornitore di hosting. Il Titolare consulta le statistiche di accesso rese disponibili dal fornitore in forma aggregata, ricavate dai log del server: nessuno strumento di misurazione viene eseguito nel browser dell'interessato.</li><li><b>Preferenze d'uso</b> — lingua, tema, passaggio a livello selezionato e minuti impostati. Conservate sul dispositivo dell'interessato; nessun destinatario.</li><li><b>Dati relativi alla circolazione ferroviaria</b> — reperiti presso ViaggiaTreno. Le richieste sono inoltrate dal server che ospita il sito, non dal browser dell'interessato: nessun dato dell'interessato raggiunge soggetti diversi dal fornitore di hosting.</li></ul><h3>Trasferimento dei dati</h3><p>I dati tecnici di connessione possono essere trattati negli Stati Uniti d'America, avendo il fornitore di hosting sede in tale Paese. Il trasferimento è assistito dall'adesione certificata all'<b>EU-U.S. Data Privacy Framework</b>, oggetto di decisione di adeguatezza della Commissione europea (art. 45), e in via aggiuntiva dalle <b>clausole contrattuali standard</b> approvate con decisione di esecuzione (UE) 2021/914 (art. 46). Le certificazioni sono verificabili sul <a href='https://www.dataprivacyframework.gov/' target='_blank' rel='noopener'>registro pubblico</a>; l'informativa del fornitore è <a href='https://www.netlify.com/privacy/' target='_blank' rel='noopener'>qui</a>.</p><h3>Periodo di conservazione dei dati</h3><p>Il Titolare non conserva alcun dato personale, non disponendo di sistemi di archiviazione. I dati tecnici di connessione sono conservati dal fornitore secondo i periodi dallo stesso stabiliti. Le preferenze memorizzate sul dispositivo permangono fino alla cancellazione dei dati del sito da parte dell'interessato.</p><h3>Diritti dell'interessato</h3><p>All'interessato sono riconosciuti i diritti previsti dagli artt. 15-21 del Regolamento: accesso, rettifica, cancellazione, limitazione del trattamento, opposizione al trattamento fondato sul legittimo interesse e portabilità dei dati.</p><p><b>Diritto di reclamo.</b> L'interessato che ritenga il trattamento non conforme al Regolamento ha diritto di proporre reclamo al <b>Garante per la protezione dei dati personali</b> (<a href='https://www.garanteprivacy.it/' target='_blank' rel='noopener'>garanteprivacy.it</a>), ai sensi dell'art. 77.</p><h3>Modalità di esercizio dei diritti</h3><p>Il Titolare non dispone di alcun archivio di dati personali. Le preferenze d'uso si cancellano direttamente, svuotando i dati del sito dalle impostazioni del browser: ha effetto immediato e non richiede alcuna istanza. I dati tecnici di connessione sono trattati dal fornitore di hosting quale responsabile del trattamento; l'interessato può indirizzare la richiesta al Titolare, che provvederà a trasmetterla.</p><p><b>Limite di identificabilità.</b> Il Titolare non è in grado di identificare gli interessati, non disponendo di account, credenziali o identificativi persistenti. Ai sensi dell'art. 11(2) del Regolamento, i diritti di cui agli artt. 15-20 non trovano applicazione qualora il Titolare non sia in grado di identificare l'interessato, salvo che quest'ultimo fornisca informazioni ulteriori che ne consentano l'identificazione.</p><p>Le richieste vanno inviate a <b>info@sbarrasu.it</b>. Il Titolare fornisce riscontro entro un mese dal ricevimento, ai sensi dell'art. 12(3).</p><h3>Cookie e archiviazione sul dispositivo</h3><p>Il sito <b>non utilizza cookie</b>, né tecnici né di profilazione. Le preferenze d'uso sono memorizzate nella memoria locale del browser (<i>localStorage</i>), la quale, a differenza dei cookie, non è trasmessa ad alcun server.</p><p>L'art. 122 del Codice in materia di protezione dei dati personali subordina al consenso l'archiviazione di informazioni nel dispositivo dell'utente. L'obbligo riguarda i cookie come qualsiasi altra tecnica di archiviazione, <b>compresa la memoria locale</b>. Il consenso non è tuttavia richiesto quando l'archiviazione è <b>strettamente necessaria</b> all'erogazione del servizio esplicitamente richiesto dall'utente. È il caso di questo sito: le informazioni conservate sono unicamente impostazioni scelte dall'interessato per il funzionamento dell'applicazione. Per questa ragione non è presente alcun banner di consenso.</p>",
+    microTit:"Se attivi la posizione", micro1:"La tua posizione ci serve solo per stimare quanti minuti ti mancano per raggiungere il passaggio a livello.", micro2:"Per gli spostamenti all'interno di Loano e Pietra Ligure, le distanze dai passaggi a livello sono già incluse nel sito: il calcolo avviene direttamente sul tuo dispositivo e <b>la tua posizione non viene inviata né condivisa con nessuno</b>.", micro3:"Solo se ti trovi fuori da Loano e Pietra Ligure, il percorso viene calcolato tramite OpenStreetMap.", micro4:"La posizione viene utilizzata esclusivamente durante questa visita e puoi disattivarla in qualsiasi momento. Sbarra Su funziona anche senza geolocalizzazione: puoi semplicemente indicare manualmente tra quanti minuti arriverai al passaggio a livello.",
+    how1:"Legge in tempo reale le partenze di <b>nove stazioni</b> fra Savona e Alassio, ritardi compresi.", how2:"Per i treni che <b>non fermano nella stazione vicina al passaggio</b> — quasi sempre Intercity — l'orario di transito viene ricostruito dal percorso, e sono marcati con un margine <span class='tag'>±N′</span>.", how3:"Il tempo a piedi puoi impostarlo a mano oppure farlo calcolare sul percorso stradale reale, condividendo la posizione.", warnbox:"I treni merci non sono indicati perché i dati di circolazione pubblica sono riservati. Il sistema è inoltre soggetto a possibili margini di errore. Verde non vuol dire attraversare senza guardare: attraversare con la sbarra abbassata o le luci lampeggianti è vietato dal Codice della Strada, oltre che pericoloso.<b>Al passaggio a livello rispetta sempre la sbarra e i segnali.</b><span class='lia'>Sbarra Su non si assume nessuna responsabilità.</span>", installBtn:"Installa",
+    sottotitolo:(c)=>"PASSAGGIO A LIVELLO · "+c.toUpperCase()
+  },
+  en: {
+    loading:"Loading…", hFrom:"Where you start from", btnGps:"Use my location", btnAddr:"Type an address", btnFind:"Search",
+    microOk:"Got it, continue", microNo:"Not now", stopPos:"Stop using my location",
+    mDevo:"I still have to leave", mStrada:"I'm already on my way",
+    modeDevo:"I count the time to get ready and set off, plus a margin.",
+    modeStrada:"You're already walking: time to set off and margin set to zero.",
+    lblWalk:"Minutes on foot", lblWalkAuto:"Minutes on foot (calculated)", lblExit:"Time to get going", lblBuf:"Margin",
+    grpPL:"Town and level crossing", adv:"Advanced",
+    advNote:"How long before the train the barrier comes down and how long after it goes up. Defaults are stopwatch measurements where available, cautious where not yet.",
+    advFermano:"Trains that stop at the station (regional)", advNonFermano:"Trains that don't stop (Intercity)", advDopo:"After the train has passed",
+    lblPre:"Barrier down", lblPost:"Barrier up", reset:"Back to defaults",
+    hNext:"Next trains", refresh:"Refresh now", howTit:"How it works / limits",
+    how4:"Barrier windows are computed once for everyone on a server and your phone only receives the result: the load on RFI doesn't grow with the number of visitors.",
+    installTxt:"You can add Sbarra Su to your home screen.",
+    unitMin:"min", nord:"north of the station", sud:"south of the station", di:"of",
+    go:"GO", goNow:"GO NOW", wait:"WAIT", vantaggio:"TO SPARE", primaDi:"BEFORE LEAVING", primaDiRip:"BEFORE SETTING OFF AGAIN",
+    noTrains:"No trains in the next hour and a half.", nessunDato:"No data right now: I can't tell you anything reliable.",
+    subGo:(h)=>"If you leave by "+h+" you'll find the barrier up.", subGoNow:(h)=>"Don't slow down: after "+h+" you'll find it down.",
+    subWait:(t,h,n,r)=>"Barrier down for "+t+", passing at "+h+(n>1?", then "+(n-1)+" more trains":"")+" · "+(r?"set off again":"leave")+" at ",
+    subGoLong:"No trains coming for now.",
+    arrive:(pl,m)=>pl+" · "+m+" min to get there",
+    stFromTo:(da,a,m,min,exit)=>"From <b>"+da+"</b> to <b>"+a+"</b>"+(m!=null?": "+m+" m, "+min+" min on foot":"")+(exit?", plus "+exit+" min to get going.":"."),
+    stNoPos:"Choose the level crossing and set the minutes on foot, or use your location.",
+    stLocating:"Finding your location…", stAffina:(m)=>"Finding your location… (so far accurate to ±"+m+" m)",
+    stImprecisa:(m)=>"The signal is too weak: your position is uncertain by ±"+m+" m, too much to work out the minutes. Try again outdoors in a few seconds, or type an address.",
+    stAcc:(m)=>" Location accurate to ±"+m+" m.", stVecchia:(m)=>" Careful: this is where you were "+m+" min ago, you may have moved.",
+    stDenied:"Permission denied. You can type an address, or set the minutes by hand.", stUnavailable:"Location unavailable. You can type an address, or set the minutes by hand.",
+    stNoGeo:"This browser has no geolocation.", stFuori:"You're outside the covered areas: set the minutes on foot by hand.",
+    stSearching:"Searching the address…", stNotFound:"Address not found.", posLabel:"current location",
+    plCloser:(n)=>"You are closer to "+n+" — switch to it",
+    fidMisurato:(f)=>"<b>Timings measured here.</b> "+f, fidAssunto:(dove,f)=>"<b>Timings measured at "+dove+"</b> and assumed equal for this crossing. "+f,
+    fidStimato:"<b>Nobody has timed the barrier here yet.</b> Timings are deliberately cautious: the barrier will appear down longer than it probably is. If you time it, let us know.",
+    more:(n)=>"Show all ("+n+")", less:"Show only the next 3", ora:"now", tra:(m)=>"in "+m+"′", passato:"passed", dataOf:(h)=>"data as of "+h,
+    legalLink:"Notices & privacy", legalTitle:"Notices & privacy", legalUpdated:"Last updated: 9 August 2026", legalBody:"<h3>Notices</h3><p>Sbarra Su is a personal, free and unofficial project. It has no relationship with RFI, Trenitalia or the Municipalities of Loano and Pietra Ligure.</p><ul><li><b>It is not a safety system.</b> It is an estimate built on public timetables and, like any estimate, it can be wrong.</li><li><b>Freight trains are invisible.</b> General traffic data is not public, so the tool cannot account for them.</li><li>Shunting, extra trains, faults and prolonged barrier closures cannot be predicted.</li><li>Train times are derived from public data and may contain anomalies or inconsistencies.</li><li>The passing time of trains that <b>do not stop at the station next to the crossing</b> is reconstructed from the route and carries a margin of uncertainty, shown as ±N′. It mostly concerns Intercity services, but it applies to any train that does not call at the station.</li></ul><p>Sbarra Su is offered free of charge and does its best with the public data available. The Controller is not liable for any damage arising from use of the site.</p><h3>Privacy notice</h3><p class='upd'>pursuant to Arts. 13 and 14 of Regulation (EU) 2016/679 (GDPR)</p><p>There is no registration, no database and no data concerning users is retained. No archive exists from which such data could be extracted. The following describes in full the few processing operations that remain.</p><h3>Controller and contact details</h3><p>The Data Controller is <b>Matteo Brock</b>, reachable at <b>info@sbarrasu.it</b>.</p><h3>Purposes of processing and legal basis</h3><p><b>Operation, maintenance and security of the site.</b> The hosting provider records the technical connection data required to deliver the pages and protect the service from abuse. <i>Legal basis:</i> the Controller's legitimate interest in providing and protecting the service (Art. 6(1)(f)).</p><p>On the data subject's own initiative, and only with their consent, the site carries out a second processing operation concerning location data, described in the following section.</p><h3>Location data</h3><p>The data subject may, on their own initiative, turn on the location feature or type an address. In that case the browser passes the device's approximate geographic coordinates to the page.</p><p><b>Origin of the data.</b> The position is determined by the data subject's own device through the browser geolocation feature. How the device determines it — GPS satellites, Wi-Fi networks, mobile cells — depends on the device and its operating system and is governed by the manufacturer's settings and privacy notice. The Controller plays no part in that determination.</p><p><b>Purpose.</b> To compute the walking route and travel time between the data subject's position and the selected level crossing.</p><p><b>Legal basis.</b> The data subject's consent (Art. 6(1)(a) of Regulation (EU) 2016/679; Arts. 122 and 126 of Legislative Decree 196/2003), given through the permission requested by the browser after reading this notice. Consent may be withdrawn at any time.</p><p><b>Recipients.</b> <b>Normally none.</b> The calculation takes place entirely in the data subject's browser, using a table of precomputed walking distances included in the site: the coordinates are not transmitted to anyone. Transmission occurs only in two residual cases — if the data subject is outside the area covered by the table, or if they type an address instead of using the device position. In those cases the coordinates are sent to <b>FOSSGIS e.V.</b>, an association under German law based in Germany (route calculation), and to the <b>OpenStreetMap Foundation</b>, a body under English law (address geocoding). These parties act as independent controllers and record the requests they receive in their own server log files.</p><p><b>Data transmitted.</b> Only the start and destination coordinates, without any identifier of the data subject.</p><p><b>Retention by the Controller.</b> None. The coordinates are neither received nor recorded by the Controller. The result of the calculation, in metres and minutes, stays in the local storage of the data subject's device.</p><p><b>Withdrawal and interruption.</b> The data subject may stop the use of location at any time through the «Stop using my location» control provided on the page, and withdraw the permission from the browser or operating system settings. Refusal and withdrawal do not limit the use of the site: the walking time can be entered manually.</p><h3>Categories of data and recipients</h3><ul><li><b>Browsing data</b> — IP address and technical connection data. Recipient: <b>Netlify, Inc.</b>, hosting provider. The Controller consults the aggregate access statistics made available by the provider, derived from server logs: no measurement tool runs in the data subject's browser.</li><li><b>Usage preferences</b> — language, theme, selected crossing and the minutes you set. Held on the data subject's device; no recipient.</li><li><b>Railway circulation data</b> — obtained from ViaggiaTreno. Requests are forwarded by the server hosting the site, not by the data subject's browser: no data concerning the data subject reaches anyone other than the hosting provider.</li></ul><h3>Data transfers</h3><p>Technical connection data may be processed in the United States, the hosting provider being established there. The transfer is supported by certified adherence to the <b>EU-U.S. Data Privacy Framework</b>, the subject of an adequacy decision of the European Commission (Art. 45), and additionally by the <b>standard contractual clauses</b> approved by Commission implementing decision (EU) 2021/914 (Art. 46). Certifications may be verified on the <a href='https://www.dataprivacyframework.gov/' target='_blank' rel='noopener'>public register</a>; the provider's notice is <a href='https://www.netlify.com/privacy/' target='_blank' rel='noopener'>here</a>.</p><h3>Retention period</h3><p>The Controller retains no personal data, having no storage systems. Technical connection data is retained by the provider for the periods it determines. Preferences stored on the device persist until the data subject clears the site's data.</p><h3>Rights of the data subject</h3><p>The data subject is granted the rights under Arts. 15-21 of the Regulation: access, rectification, erasure, restriction of processing, objection to processing based on legitimate interest, and data portability.</p><p><b>Right to complain.</b> A data subject who considers the processing not to comply with the Regulation has the right to lodge a complaint with the Italian <b>Data Protection Authority</b> (<a href='https://www.garanteprivacy.it/' target='_blank' rel='noopener'>garanteprivacy.it</a>) under Art. 77.</p><h3>How rights are exercised</h3><p>The Controller holds no archive of personal data. Usage preferences are erased directly, by clearing the site's data in browser settings: it takes immediate effect and requires no request. Technical connection data is processed by the hosting provider as processor; the data subject may address the request to the Controller, who will forward it.</p><p><b>Limits of identifiability.</b> The Controller is not in a position to identify data subjects, holding no accounts, credentials or persistent identifiers. Under Art. 11(2) of the Regulation, the rights under Arts. 15-20 do not apply where the Controller is unable to identify the data subject, unless the data subject provides additional information enabling their identification.</p><p>Requests should be sent to <b>info@sbarrasu.it</b>. The Controller responds within one month of receipt, under Art. 12(3).</p><h3>Cookies and storage on your device</h3><p>The site <b>uses no cookies</b>, neither technical nor for profiling. Usage preferences are stored in the browser's local storage which, unlike cookies, is never transmitted to any server.</p><p>Art. 122 of the Italian Data Protection Code makes the storing of information on a user's device subject to consent. That obligation covers cookies and any other storage technique alike, <b>local storage included</b>. Consent is not required, however, where the storage is <b>strictly necessary</b> to provide the service explicitly requested by the user. That is the case here: the information kept consists solely of settings chosen by the data subject for the application to work. For this reason no consent banner is present.</p>",
+    microTit:"If you turn on location", micro1:"Your location is used only to estimate how many minutes you need to reach the level crossing.", micro2:"For journeys within Loano and Pietra Ligure, the distances from the level crossings are already included in the site: the calculation happens directly on your device and <b>your position is neither sent nor shared with anyone</b>.", micro3:"Only if you are outside Loano and Pietra Ligure is the route computed through OpenStreetMap.", micro4:"Your location is used solely during this visit and you can turn it off at any time. Sbarra Su works without geolocation too: you can simply enter by hand how many minutes you need to reach the crossing.",
+    how1:"Reads live departures from <b>nine stations</b> between Savona and Alassio, delays included.", how2:"For trains that <b>do not stop at the station next to the crossing</b> — usually Intercity services — the passing time is reconstructed from the route, and they carry a <span class='tag'>±N′</span> margin.", how3:"Walking time can be set by hand, or computed on the real street route by sharing your location.", warnbox:"Freight trains are not shown because public traffic data is restricted. The system is also subject to possible margins of error. Green does not mean cross without looking: crossing while the barrier is down or the lights are flashing is prohibited by the Italian Highway Code, as well as dangerous.<b>At the crossing, always respect the barrier and the signals.</b><span class='lia'>Sbarra Su accepts no liability.</span>", installBtn:"Install",
+    sottotitolo:(c)=>"LEVEL CROSSING · "+c.toUpperCase()
+  }
+};
+const CONTATTO = "info@sbarrasu.it";
+
+// ---- stato ---------------------------------------------------------------------------
+const CFG_V = 1, CHIAVE = "sbarraRiviera";
+const $ = (id) => document.getElementById(id);
+const els = {};
+["light","badge","verdict","big","lbl","bar","barIn","sub","whereto","posStatus","rowGps","gps","btnAddr","rowAddr","addr","find",
+ "micro","microTit","micro1","micro2","micro3","micro4","microOk","microNo","rowStop","stopPos","mDevo","mStrada","modeNote",
+ "lblWalk","walk","walkV","rowExit","exit","exitV","rowBuf","buf","bufV","comune","pl","plNote","plVicino","plVicinoBtn","fiducia",
+ "pre","preV","prePassa","prePassaV","post","postV","reset","list","rowMore","more","refresh","dataOf","how1","how2","how3",
+ "warnbox","legalOpen","contatto","install","installBtn","legal","legalClose","legalTitle","legalUpdated","legalBody","clock","tema","l-it","l-en","sottotitolo","adv"]
+ .forEach((id) => { els[id] = $(id); });
+
+let cfg = { v: CFG_V, lang: null, tema: null, comune: null, pl: null, plScelto: false,
+            walk: 3, exit: 3, buf: 1, cammino: false, tempi: null,
+            pos: null, posLabel: null, posAcc: null, posT: 0, routedM: null, routedMin: null, letta: false, tutti: false };
+try { const s = JSON.parse(localStorage.getItem(CHIAVE) || "null"); if (s && s.v === CFG_V) cfg = Object.assign(cfg, s); } catch (e) {}
+const save = () => { try { localStorage.setItem(CHIAVE, JSON.stringify(cfg)); } catch (e) {} };
+const T = () => DICT[cfg.lang] || DICT.it;
+if (!cfg.lang) cfg.lang = /^it/i.test(navigator.language || "") ? "it" : "en";
+
+let LINEA = null, TRANSITI = null, tsDati = 0, TABELLE = {};
+let erroreDati = false;
+
+// ---- dati di linea --------------------------------------------------------------------
+function comuneDi(id) { return LINEA.comuni.find((c) => c.id === id); }
+function passaggioDi(id) { for (const c of LINEA.comuni) { const p = c.passaggi.find((x) => x.id === id); if (p) return { ...p, comune: c }; } return null; }
+function stazioneDi(id) { return LINEA.stazioni.find((s) => s.id === id); }
+function tempiDi(p) { return cfg.tempi || p.comune.tempi || LINEA.tempiPrudenti; }
+function fiduciaDi(p) { return p.misurato ? "misurato" : (p.comune.tempi ? "assunto" : "stimato"); }
+
+// ---- tabella dei percorsi a piedi ----------------------------------------------------
+async function tabella(c) {
+  if (TABELLE[c.id] !== undefined) return TABELLE[c.id];
+  try { const r = await fetch("/" + c.tabella); TABELLE[c.id] = r.ok ? await r.json() : null; } catch (e) { TABELLE[c.id] = null; }
+  return TABELLE[c.id];
+}
+function cella(TAB, id, r, c) {
+  const g = TAB.g; if (r < 0 || c < 0 || r >= g.nr || c >= g.nc) return null;
+  const s = TAB.t[id]; if (!s) return null;
+  const tre = s.substr((r * g.nc + c) * 3, 3); return tre === "..." ? null : parseInt(tre, 36) * 10;
+}
+// le quattro celle attorno vengono mediate, ma se non vanno d'accordo si prende
+// la piu' lontana: in mezzo passa la ferrovia e la distanza a piedi salta.
+function distanzaTabella(TAB, id, pos) {
+  const g = TAB.g, fr = (pos.lat - g.la0) / g.dla, fc = (pos.lon - g.lo0) / g.dlo;
+  if (fr < 0 || fc < 0 || fr > g.nr - 1 || fc > g.nc - 1) return null;
+  const r0 = Math.floor(fr), c0 = Math.floor(fc), tr = fr - r0, tc = fc - c0;
+  const v = [cella(TAB, id, r0, c0), cella(TAB, id, r0, c0 + 1), cella(TAB, id, r0 + 1, c0), cella(TAB, id, r0 + 1, c0 + 1)];
+  const ok = v.filter((x) => x !== null); if (!ok.length) return null;
+  const mx = Math.max(...ok), mn = Math.min(...ok);
+  if (v.indexOf(null) >= 0 || mx - mn > 150) return mx;
+  return (1 - tr) * ((1 - tc) * v[0] + tc * v[1]) + tr * ((1 - tc) * v[2] + tc * v[3]);
+}
+const hav = (a, b, c, d) => { const R = 6371000, p1 = a * Math.PI / 180, p2 = c * Math.PI / 180, dp = (c - a) * Math.PI / 180, dl = (d - b) * Math.PI / 180;
+  const x = Math.sin(dp / 2) ** 2 + Math.cos(p1) * Math.cos(p2) * Math.sin(dl / 2) ** 2; return 2 * R * Math.asin(Math.sqrt(x)); };
+function piuVicino(pos) {
+  let best = null, bd = Infinity;
+  for (const c of LINEA.comuni) for (const p of c.passaggi) { const d = hav(pos.lat, pos.lon, p.lat, p.lon); if (d < bd) { bd = d; best = { ...p, comune: c }; } }
+  return { p: best, m: bd };
+}
+async function calcolaPercorso(pos, p) {
+  const TAB = await tabella(p.comune);
+  const m = TAB ? distanzaTabella(TAB, p.id, pos) : null;
+  if (m === null) return null;
+  return { m: Math.round(m), min: Math.max(1, Math.ceil(m / 75)) };
+}
+
+// ---- posizione --------------------------------------------------------------------------
+const GPS_BUONA = 35, GPS_LIMITE = 150, POS_FRESCA = 45000, POS_VECCHIA = 120000;
+function acquisisci(silenzioso) {
+  const t = T();
+  if (!navigator.geolocation) { if (!silenzioso) els.posStatus.textContent = t.stNoGeo; return; }
+  if (!silenzioso) { els.gps.disabled = true; els.posStatus.textContent = t.stLocating; }
+  let best = null, wid = null, chiuso = false, tmr = null;
+  const stop = () => { if (wid !== null) { navigator.geolocation.clearWatch(wid); wid = null; } if (tmr) { clearTimeout(tmr); tmr = null; } if (!silenzioso) els.gps.disabled = false; };
+  const chiudi = () => {
+    if (chiuso) return; chiuso = true; stop();
+    if (!best) { if (!silenzioso) els.posStatus.textContent = t.stUnavailable; return; }
+    const acc = Math.round(best.coords.accuracy);
+    if (acc > GPS_LIMITE) { if (!silenzioso) els.posStatus.textContent = t.stImprecisa(acc); return; }
+    setPosition({ lat: best.coords.latitude, lon: best.coords.longitude }, t.posLabel, acc);
+  };
+  tmr = setTimeout(chiudi, 10000);
+  wid = navigator.geolocation.watchPosition((p) => {
+    if (chiuso) return;
+    if (!best || p.coords.accuracy < best.coords.accuracy) best = p;
+    if (best.coords.accuracy <= GPS_BUONA) chiudi(); else if (!silenzioso) els.posStatus.textContent = t.stAffina(Math.round(best.coords.accuracy));
+  }, (err) => {
+    if (chiuso) return;
+    if (err.code === 1) { chiuso = true; stop(); if (!silenzioso) els.posStatus.textContent = t.stDenied; return; }
+    if (!best) { chiuso = true; stop(); if (!silenzioso) els.posStatus.textContent = t.stUnavailable; }
+  }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 });
+}
+function seConcesso(poi) {
+  if (!navigator.permissions || !navigator.permissions.query) { poi(true); return; }
+  try { navigator.permissions.query({ name: "geolocation" }).then((s) => poi(s.state === "granted")).catch(() => poi(false)); } catch (e) { poi(false); }
+}
+function rinnovaPosizione() {
+  if (!cfg.letta || !cfg.pos || document.hidden) return;
+  if (Date.now() - (cfg.posT || 0) < POS_FRESCA) return;
+  seConcesso((ok) => { if (ok) acquisisci(true); });
+}
+async function setPosition(pos, label, acc) {
+  cfg.pos = pos; cfg.posLabel = label; cfg.posAcc = typeof acc === "number" ? acc : null; cfg.posT = Date.now();
+  const v = piuVicino(pos);
+  if (!cfg.plScelto && v.p) { cfg.comune = v.p.comune.id; cfg.pl = v.p.id; }
+  const p = passaggioDi(cfg.pl);
+  const r = await calcolaPercorso(pos, p);
+  cfg.routedM = r ? r.m : null; cfg.routedMin = r ? r.min : null;
+  save(); syncTutto(); render();
+}
+function sbloccaPosizione() {
+  cfg.pos = null; cfg.posLabel = null; cfg.posAcc = null; cfg.routedM = null; cfg.routedMin = null; cfg.plScelto = false;
+  save(); syncTutto(); render();
+}
+async function geocode(q) {
+  const c = comuneDi(cfg.comune);
+  if (!new RegExp(c.nome.split(" ")[0], "i").test(q)) q = q + ", " + c.nome;
+  const r = await fetch("https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=it&q=" + encodeURIComponent(q), { headers: { Accept: "application/json" } });
+  return r.json();
+}
+
+// ---- dati dei treni ------------------------------------------------------------------------
+async function carica() {
+  try {
+    const ctrl = new AbortController(); const k = setTimeout(() => ctrl.abort(), 12000);
+    const r = await fetch("/api/transiti", { cache: "no-store", signal: ctrl.signal }); clearTimeout(k);
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    const d = await r.json();
+    if (!d || !d.transiti) throw new Error("forma inattesa");
+    TRANSITI = d.transiti; tsDati = d.ts || Date.now(); erroreDati = false;
+  } catch (e) { erroreDati = true; }
+  render();
+}
+
+// ---- interfaccia --------------------------------------------------------------------------
+const hhmm = (ms) => new Intl.DateTimeFormat(cfg.lang === "it" ? "it-IT" : "en-GB", { timeZone: "Europe/Rome", hour: "2-digit", minute: "2-digit" }).format(new Date(ms));
+function applyLang() {
+  const t = T();
+  document.documentElement.lang = cfg.lang;
+  document.querySelectorAll("[data-i18n]").forEach((el) => { const k = el.getAttribute("data-i18n"); if (t[k]) el.textContent = t[k]; });
+  ["microTit","micro1","micro2","micro3","micro4"].forEach((k) => { els[k].innerHTML = t[k]; });
+  els.how1.innerHTML = t.how1; els.how2.innerHTML = t.how2; els.how3.innerHTML = t.how3;
+  els.warnbox.textContent = t.warnbox; els.legalOpen.textContent = t.legalLink; els.contatto.textContent = CONTATTO;
+  els.legalTitle.textContent = t.legalTitle; els.legalUpdated.textContent = t.legalUpdated; els.legalBody.innerHTML = t.legalBody;
+  els.installBtn.textContent = t.installBtn;
+  els["l-it"].classList.toggle("on", cfg.lang === "it"); els["l-en"].classList.toggle("on", cfg.lang === "en");
+  syncTutto();
+}
+function applyTema() {
+  const scuro = cfg.tema ? cfg.tema === "scuro" : !(window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches);
+  document.documentElement.setAttribute("data-tema", scuro ? "scuro" : "chiaro");
+  els.tema.textContent = scuro ? "☀" : "☾";
+}
+function opzioni(sel, lista, val) {
+  sel.innerHTML = "";
+  for (const o of lista) { const e = document.createElement("option"); e.value = o.value; e.textContent = o.label; if (o.value === val) e.selected = true; sel.appendChild(e); }
+}
+function syncTutto() {
+  const t = T();
+  if (!LINEA) return;
+  if (!cfg.comune || !comuneDi(cfg.comune)) cfg.comune = LINEA.comuni[0].id;
+  const c = comuneDi(cfg.comune);
+  if (!cfg.pl || !c.passaggi.find((p) => p.id === cfg.pl)) cfg.pl = c.passaggi[0].id;
+  const p = passaggioDi(cfg.pl);
+  els.sottotitolo.textContent = t.sottotitolo(c.nome);
+  opzioni(els.comune, LINEA.comuni.map((x) => ({ value: x.id, label: x.nome })), cfg.comune);
+  opzioni(els.pl, c.passaggi.slice().sort((a, b) => a.km - b.km).map((x) => ({ value: x.id, label: x.nome })), cfg.pl);
+  // riferimento: la stazione piu' vicina al passaggio
+  let st = null, bd = Infinity; for (const s of LINEA.stazioni) { const d = Math.abs(s.km - p.km); if (d < bd) { bd = d; st = s; } }
+  els.plNote.textContent = Math.round(bd * 1000) + " m " + (p.km < st.km ? t.nord : t.sud) + " " + t.di + " " + st.nome;
+  // fiducia
+  const f = fiduciaDi(p), fonte = p.comune.tempi ? p.comune.tempi.fonte : "";
+  const mis = p.comune.passaggi.find((x) => x.misurato);
+  els.fiducia.className = "fiducia " + f;
+  els.fiducia.innerHTML = f === "misurato" ? t.fidMisurato(fonte) : f === "assunto" ? t.fidAssunto(mis ? mis.nome : "", fonte) : t.fidStimato;
+  // tempi
+  const tempi = tempiDi(p);
+  els.pre.value = tempi.pre; els.prePassa.value = tempi.prePassa; els.post.value = tempi.post;
+  els.preV.textContent = mmss(tempi.pre); els.prePassaV.textContent = mmss(tempi.prePassa); els.postV.textContent = mmss(tempi.post);
+  // modo e cursori
+  els.mDevo.classList.toggle("on", !cfg.cammino); els.mStrada.classList.toggle("on", cfg.cammino);
+  els.modeNote.textContent = cfg.cammino ? t.modeStrada : t.modeDevo;
+  els.rowExit.hidden = cfg.cammino; els.rowBuf.hidden = cfg.cammino;
+  const auto = cfg.routedMin !== null;
+  els.walk.disabled = auto; els.lblWalk.textContent = auto ? t.lblWalkAuto : t.lblWalk;
+  els.walk.value = auto ? cfg.routedMin : cfg.walk; els.walkV.textContent = (auto ? cfg.routedMin : cfg.walk) + " " + t.unitMin;
+  els.exit.value = cfg.exit; els.exitV.textContent = cfg.exit + " " + t.unitMin;
+  els.buf.value = cfg.buf; els.bufV.textContent = cfg.buf + " " + t.unitMin;
+  // posizione
+  els.rowGps.hidden = !!cfg.pos; els.rowStop.hidden = !cfg.pos; els.rowAddr.hidden = true;
+  if (cfg.pos) {
+    els.posStatus.innerHTML = t.stFromTo(cfg.posLabel, p.nome, cfg.routedM, cfg.routedMin, cfg.cammino ? 0 : cfg.exit)
+      + (cfg.routedM === null ? " " + t.stFuori : "")
+      + (cfg.posAcc && cfg.posAcc > GPS_BUONA ? t.stAcc(cfg.posAcc) : "")
+      + (cfg.posT && Date.now() - cfg.posT > POS_VECCHIA ? t.stVecchia(Math.round((Date.now() - cfg.posT) / 60000)) : "");
+    const v = piuVicino(cfg.pos);
+    els.plVicino.hidden = !(v.p && v.p.id !== cfg.pl);
+    if (v.p) { els.plVicinoBtn.textContent = t.plCloser(v.p.nome); els.plVicinoBtn.onclick = () => { cfg.comune = v.p.comune.id; cfg.pl = v.p.id; cfg.plScelto = true; setPosition(cfg.pos, cfg.posLabel, cfg.posAcc); }; }
+  } else { els.posStatus.textContent = t.stNoPos; els.plVicino.hidden = true; }
+}
+const mmss = (m) => { const s = Math.round(m * 60); return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); };
+const dur = (ms) => Math.max(0, Math.round(ms / 60000));
+
+function render() {
+  const t = T(); if (!LINEA) return;
+  const now = Date.now(); els.clock.textContent = hhmm(now);
+  const p = passaggioDi(cfg.pl), tempi = tempiDi(p);
+  const lista = (TRANSITI && TRANSITI[p.id]) || null;
+  els.light.className = "light";
+  ["big","lbl","bar"].forEach((k) => { els[k].hidden = true; }); els.sub.textContent = ""; els.whereto.textContent = "";
+  els.dataOf.textContent = tsDati ? t.dataOf(hhmm(tsDati)) : "";
+  if (!lista || erroreDati && !TRANSITI) { els.badge.textContent = "…"; els.verdict.textContent = erroreDati ? t.nessunDato : t.loading; renderLista([]); return; }
+
+  const fin = finestreDa(lista, tempi);
+  const walk = cfg.routedMin !== null ? cfg.routedMin : cfg.walk;
+  const cammino = (walk + (cfg.cammino ? 0 : cfg.exit)) * 60000, buffer = (cfg.cammino ? 0 : cfg.buf) * 60000;
+  const v = valuta(fin, now, now + cammino, buffer);
+  els.whereto.textContent = t.arrive(p.nome, walk);
+  if (v.libero) {
+    const okMin = v.okFino === null ? null : dur(v.okFino - now);
+    const subito = okMin !== null && okMin < 3;
+    els.light.classList.add(subito ? "warn" : "ok"); els.badge.textContent = subito ? "!" : "✓";
+    els.verdict.textContent = subito ? t.goNow : t.go;
+    if (okMin !== null) {
+      els.big.hidden = false; els.big.innerHTML = okMin + "<small>min</small>"; els.lbl.hidden = false; els.lbl.textContent = t.vantaggio;
+      els.sub.textContent = subito ? t.subGoNow(hhmm(v.okFino)) : t.subGo(hhmm(v.okFino));
+      els.bar.hidden = false; els.barIn.style.width = Math.min(100, okMin / 30 * 100) + "%";
+    } else els.sub.textContent = t.subGoLong;
+  } else {
+    const attesa = v.attesaFino === null ? null : dur(v.attesaFino - now);
+    els.light.classList.add("ko"); els.badge.textContent = "✕"; els.verdict.textContent = t.wait;
+    if (attesa !== null) {
+      els.big.hidden = false; els.big.innerHTML = attesa + "<small>min</small>"; els.lbl.hidden = false; els.lbl.textContent = cfg.cammino ? t.primaDiRip : t.primaDi;
+      const tr = v.finestra.treno;
+      els.sub.textContent = t.subWait(tr.cat + " " + tr.num + " → " + tr.dest, hhmm(v.finestra.at), v.fila, cfg.cammino) + hhmm(v.attesaFino);
+      els.bar.hidden = false; els.barIn.style.width = Math.max(4, 100 - Math.min(100, attesa / 30 * 100)) + "%";
+    }
+  }
+  renderLista(lista);
+}
+function renderLista(lista) {
+  const t = T(), now = Date.now();
+  const rows = lista.filter((x) => !x.superato && x.at > now - 2 * 60000 && x.at < now + 90 * 60000);
+  const tb = els.list.querySelector("tbody"); tb.innerHTML = "";
+  if (!rows.length) { tb.innerHTML = "<tr><td class='dest'>" + t.noTrains + "</td></tr>"; els.rowMore.hidden = true; return; }
+  const mostra = cfg.tutti ? rows : rows.slice(0, 3);
+  for (const x of mostra) {
+    const tr = document.createElement("tr"), m = Math.round((x.at - now) / 60000);
+    const cat = /^IC|^EC|^FR|^FA|^FB/.test(x.treno.cat) ? "ic" : "reg";
+    tr.innerHTML = "<td class='t'>" + hhmm(x.at) + "</td><td><span class='tag " + cat + "'>" + x.treno.cat + "</span>" + x.treno.num
+      + (x.pad ? "<span class='pm'>±" + x.pad + "′</span>" : "") + "<div class='dest'>→ " + x.treno.dest
+      + (x.treno.late > 0 ? " <span class='late'>+" + x.treno.late + "′</span>" : "") + "</div></td><td class='r'>" + (m <= 0 ? t.ora : t.tra(m)) + "</td>";
+    tb.appendChild(tr);
+  }
+  els.rowMore.hidden = rows.length <= 3; els.more.textContent = cfg.tutti ? t.less : t.more(rows.length);
+}
+
+// ---- eventi --------------------------------------------------------------------------------
+els["l-it"].onclick = () => { cfg.lang = "it"; save(); applyLang(); render(); };
+els["l-en"].onclick = () => { cfg.lang = "en"; save(); applyLang(); render(); };
+els.tema.onclick = () => { const s = document.documentElement.getAttribute("data-tema") === "scuro"; cfg.tema = s ? "chiaro" : "scuro"; save(); applyTema(); };
+els.comune.onchange = () => { cfg.comune = els.comune.value; cfg.pl = null; cfg.plScelto = true; save(); syncTutto(); if (cfg.pos) setPosition(cfg.pos, cfg.posLabel, cfg.posAcc); else render(); };
+els.pl.onchange = () => { cfg.pl = els.pl.value; cfg.plScelto = true; save(); syncTutto(); if (cfg.pos) setPosition(cfg.pos, cfg.posLabel, cfg.posAcc); else render(); };
+els.mDevo.onclick = () => { cfg.cammino = false; save(); syncTutto(); render(); };
+els.mStrada.onclick = () => { cfg.cammino = true; save(); syncTutto(); render(); };
+els.walk.oninput = () => { cfg.walk = +els.walk.value; save(); syncTutto(); render(); };
+els.exit.oninput = () => { cfg.exit = +els.exit.value; save(); syncTutto(); render(); };
+els.buf.oninput = () => { cfg.buf = +els.buf.value; save(); syncTutto(); render(); };
+const setTempi = () => { cfg.tempi = { pre: +els.pre.value, prePassa: +els.prePassa.value, post: +els.post.value }; save(); syncTutto(); render(); };
+els.pre.oninput = setTempi; els.prePassa.oninput = setTempi; els.post.oninput = setTempi;
+els.reset.onclick = () => { cfg.tempi = null; save(); syncTutto(); render(); };
+els.gps.onclick = () => { if (cfg.letta) acquisisci(false); else els.micro.hidden = false; };
+els.microOk.onclick = () => { cfg.letta = true; save(); els.micro.hidden = true; acquisisci(false); };
+els.microNo.onclick = () => { els.micro.hidden = true; };
+els.stopPos.onclick = sbloccaPosizione;
+els.btnAddr.onclick = () => { els.rowAddr.hidden = !els.rowAddr.hidden; };
+els.find.onclick = async () => {
+  const q = els.addr.value.trim(); if (!q) return;
+  els.posStatus.textContent = T().stSearching;
+  try { const j = await geocode(q); if (!j || !j.length) { els.posStatus.textContent = T().stNotFound; return; }
+        setPosition({ lat: +j[0].lat, lon: +j[0].lon }, q, null); } catch (e) { els.posStatus.textContent = T().stUnavailable; }
+};
+els.more.onclick = () => { cfg.tutti = !cfg.tutti; save(); render(); };
+els.refresh.onclick = carica;
+els.legalOpen.onclick = () => { els.legal.hidden = false; };
+els.legalClose.onclick = () => { els.legal.hidden = true; };
+document.addEventListener("visibilitychange", () => { if (!document.hidden) { rinnovaPosizione(); carica(); } });
+setInterval(() => { render(); }, 1000);
+setInterval(carica, 30000);
+setInterval(rinnovaPosizione, 15000);
+
+// installazione
+let promptInstall = null;
+window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); promptInstall = e; els.install.hidden = false; });
+els.installBtn.onclick = async () => { if (!promptInstall) return; promptInstall.prompt(); await promptInstall.userChoice; promptInstall = null; els.install.hidden = true; };
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js").catch(() => {});
+
+// ---- avvio ----------------------------------------------------------------------------------
+applyTema();
+(async () => {
+  try { LINEA = await (await fetch("/linea.json")).json(); } catch (e) { els.verdict.textContent = T().nessunDato; return; }
+  applyLang();
+  if (cfg.pos) { const p = passaggioDi(cfg.pl); const r = await calcolaPercorso(cfg.pos, p); cfg.routedM = r ? r.m : null; cfg.routedMin = r ? r.min : null; syncTutto(); }
+  render(); carica(); rinnovaPosizione();
+})();
+</script>
+</body>
+</html>
